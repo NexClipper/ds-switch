@@ -4,13 +4,13 @@ ds_switch:
   monitor_interval: 5 # second
   evaluate_interval: 60 # second
 prometheus:
-  end_point: "http://68.183.54.133:30099"
+  end_point: "http://localhost:30099"
   monitor_api: 
     type: "GET"
     method: "/-/healthy"
 grafana:
-  bearer: "eyJrIjoiaW1oWFZ4ZWd0NndpWTJvaFFSOE02WjBrTmJYNUxVWWQiLCJuIjoiYXBpa2V5IiwiaWQiOjF9"
-  end_point: "http://68.183.54.133:31947"
+  bearer: ""
+  end_point: "http://localhost:31947"
   ds_update_api:
     type: "PUT"
     method: "api/datasources" # /api/datasource/:datasourceid

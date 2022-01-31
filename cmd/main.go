@@ -10,6 +10,7 @@ import (
 	"github.com/NexClipper/ds-switch/pkg/config"
 	"github.com/NexClipper/ds-switch/pkg/ds"
 	"github.com/NexClipper/ds-switch/pkg/monitor"
+	"github.com/kelseyhightower/envconfig"
 )
 
 func main() {
@@ -21,7 +22,12 @@ func main() {
 		panic(err)
 	}
 
-	log.Println(cfg)
+	err = envconfig.Process("", cfg)
+	if err != nil {
+		panic(err)
+	}
+
+	log.Printf("envrionment: %+v", cfg)
 
 	datasource := ds.New(cfg)
 	if datasource == nil {
