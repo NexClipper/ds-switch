@@ -13,6 +13,7 @@ LABEL version=0.1.0
 RUN apk update && apk add --no-cache openssh-client bash
 
 COPY --from=builder ./usr/src/ds-switch/bin/ds-switch /
+COPY --from=builder ./usr/src/ds-switch/conf/ds.yml /conf/
 COPY --from=builder ./usr/src/ds-switch/entrypoint.sh /
 
 ENV DS_SWITCH_MONITOR_INTERVAL 5
