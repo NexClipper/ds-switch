@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ds-switch
+  labels:
+    app: ds-switch
+data:
+  DS_SWITCH_MONITOR_INTERVAL: "5"
+  DS_SWITCH_EVALUATE_INTERVAL: "60"
+  PROMETHEUS_END_POINT: "http://68.183.54.133:30099"
+  PROMETHEUS_MONITOR_API_TYPE: "GET"
+  PROMETHEUS_MONITOR_API_METHOD: "/-/healthy"
+  GRAFANA_BEARER: "eyJrIjoiNVZ6TWtRcjRpUEZ0V3g3TGtEUTdaWnVkUWdWczBXYm4iLCJuIjoiZHMtc3dpdGNoIiwiaWQiOjF9"  
+  GRAFANA_END_POINT: "http://68.183.54.133:31947"
+  GRAFANA_DS_UPDATE_API_TYPE: "PUT" 
+  GRAFANA_DS_UPDATE_API_METHOD: "api/datasources" 
+  GRAFANA_DS_GET_API_TYPE: "GET"
+  GRAFANA_DS_GET_API_METHOD: "api/datasources"
+  GRAFANA_DS_NAME_PRIMARY: "Prometheus"
+  GRAFANA_DS_NAME_BACKUP: "Prometheus-Cortex"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: ds-switch
+  name: ds-switch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: ds-switch
+  template:
+    metadata:
+      labels:
+        name: ds-switch
+    spec:
+      containers:
+        - image: repo.nexclipper.io/hana/ds-switch
+          name: ds-switch
+          resources: {}
+          envFrom:
+          - configMapRef:
+              name: ds-switch
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - mountPath: /app/
+              name: ds-switch-claim0
+      restartPolicy: Always
+      volumes:
+        - name: ds-switch-claim0
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: ds-switch
+  name: ds-switch
+spec:
+  type: ClusterIP
+  ports:
+    - name: "service-port"
+      port: 8080
+  selector:
+    name: ds-switch
