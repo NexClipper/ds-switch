@@ -19,4 +19,4 @@ grafana:
     method: "api/datasources" # /api/datasource"
   ds_name:
     primary: "Prometheus"
-    backup: "ProPrometheus-Cortex"
+    backup: "Prometheus-Cortex"
