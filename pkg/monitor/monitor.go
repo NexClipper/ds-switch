@@ -61,6 +61,7 @@ func (m *Monitor) Run() {
 		resp, err := client.Do(req)
 		if err != nil {
 			log.Println(err)
+			m.lastStatus = false
 			return
 		}
 
