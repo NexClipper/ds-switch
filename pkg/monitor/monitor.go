@@ -61,6 +61,7 @@ func (m *Monitor) Run() {
 		resp, err := client.Do(req)
 		if err != nil {
 			log.Println(err)
+			m.datasource.SetDefaultDatasource(m.datasource.Backup)
 			m.lastStatus = false
 			return
 		}
@@ -93,6 +94,10 @@ func (m *Monitor) monitoring() {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println(err)
+		if m.lastStatus == true {
+			m.datasource.SetDefaultDatasource(m.datasource.Backup)
+			m.lastStatus = false
+		}
 		return
 	}
 
