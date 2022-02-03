@@ -56,6 +56,10 @@ func (s *StatusQueue) RemoveAll() {
 	s.Lock()
 	defer s.Unlock()
 
+	if s.items.Len() == 0 {
+		return
+	}
+
 	s.removeAll()
 
 }

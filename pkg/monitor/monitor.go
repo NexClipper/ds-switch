@@ -61,6 +61,7 @@ func (m *Monitor) Run() {
 		resp, err := client.Do(req)
 		if err != nil {
 			log.Println(err)
+			log.Println("init backup datasource connect")
 			m.datasource.SetDefaultDatasource(m.datasource.Backup)
 			m.lastStatus = false
 			return
@@ -69,10 +70,12 @@ func (m *Monitor) Run() {
 		defer resp.Body.Close()
 
 		if resp.StatusCode == 200 {
-			log.Println("init 200 success")
+			log.Printf("init %d success(primary datasource connect)\n", resp.StatusCode)
+			m.datasource.SetDefaultDatasource(m.datasource.Primary)
 			m.lastStatus = true
 		} else {
-			log.Println("init xxx fail")
+			log.Printf("init %d fail(backup datasource connect)\n", resp.StatusCode)
+			m.datasource.SetDefaultDatasource(m.datasource.Backup)
 			m.lastStatus = false
 		}
 
@@ -94,7 +97,11 @@ func (m *Monitor) monitoring() {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println(err)
-		if m.lastStatus == true {
+		if m.lastStatus == false {
+			m.statusQueue.RemoveAll()
+		} else {
+			// backup datasource로 연결
+			log.Println("backup datasource connect")
 			m.datasource.SetDefaultDatasource(m.datasource.Backup)
 			m.lastStatus = false
 		}
@@ -104,12 +111,12 @@ func (m *Monitor) monitoring() {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-		log.Println("200 success")
+		log.Printf("%d success\n", resp.StatusCode)
 		if m.lastStatus == false {
 			m.statusQueue.Enqueue(true)
 		}
 	} else {
-		log.Println("xxx fail")
+		log.Printf("%d fail\n", resp.StatusCode)
 		if m.lastStatus == false {
 			m.statusQueue.RemoveAll()
 		} else {
