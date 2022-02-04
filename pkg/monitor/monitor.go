@@ -1,7 +1,6 @@
 package monitor
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -53,7 +52,9 @@ func (m *Monitor) Run() {
 	init.Do(func() {
 		req, err := http.NewRequest("GET", m.PrometheusURL, nil)
 		if err != nil {
-			fmt.Println(err)
+			log.Printf("init request build fail: %s\n", err.Error)
+			m.datasource.SetDefaultDatasource(m.datasource.Backup)
+			m.lastStatus = false
 			return
 		}
 
@@ -89,7 +90,15 @@ func (m *Monitor) Run() {
 func (m *Monitor) monitoring() {
 	req, err := http.NewRequest("GET", m.PrometheusURL, nil)
 	if err != nil {
-		log.Println(err)
+		log.Printf("request build fail: %s\n", err.Error)
+		if m.lastStatus == false {
+			m.statusQueue.RemoveAll()
+		} else {
+			// backup datasource로 연결
+			log.Println("backup datasource connect")
+			m.datasource.SetDefaultDatasource(m.datasource.Backup)
+			m.lastStatus = false
+		}
 		return
 	}
 
